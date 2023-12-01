@@ -15,7 +15,8 @@ void e2(vector<string> input)
 
 int main() {
     // INPUT
-    ifstream input_file("../../input/02");
+    ifstream input_file("../../input/01mini");
+    /* ifstream input_file("../../input/01"); */
     if (!input_file.is_open()) {
         cerr << "Failed to open input file!" << endl;
         return 1;
