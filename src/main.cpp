@@ -6,6 +6,10 @@
 #include "utils.cpp"
 using namespace std;
 
+#define CUBES_R 12
+#define CUBES_G 13
+#define CUBES_B 14
+
 bool rgb(string line)
 {
     int buffer = 0;
@@ -13,40 +17,55 @@ bool rgb(string line)
     int g = 0;
     int b = 0;
     bool checking = false;
+    bool second_digit = false;
+
     for (char chara : line)
     {
         if (checking)
         {
             if (chara == 'r')
             {
-                r += buffer;
+                /* r += buffer; */
+                if (buffer > r)
+                    r = buffer;
                 checking = false;
             }
             if (chara == 'g')
             {
-                g += buffer;
+                /* g += buffer; */
+                if (buffer > g)
+                    g = buffer;
                 checking = false;
             }
             if (chara == 'b')
             {
-                b += buffer;
+                /* b += buffer; */
+                if (buffer > b)
+                    b = buffer;
                 checking = false;
             }
         }
         else    // if (!checking)
-            if (isdigit(chara))
+            if (second_digit)
             {
-                buffer = chara - '0';
+                if (isdigit(chara))
+                    buffer = (buffer * 10) + (chara - '0');
                 checking = true;
-                // FIX: pueden ser 2 digitos
+                second_digit = false;
             }
+            else
+                if (isdigit(chara))
+                {
+                    buffer = chara - '0';
+                    second_digit = true;
+                }
     }
-    cout << "R " << r << " , G " << g << " , B " << b << endl;
-    if (r > 12)
+    cout << "R:" << r << "|G:" << g << "|B:" << b << "\t";
+    if (r > CUBES_R)
         return false;
-    if (g > 13)
+    if (g > CUBES_G)
         return false;
-    if (b > 14)
+    if (b > CUBES_B)
         return false;
     return true;
 }
@@ -56,21 +75,35 @@ bool rgb(string line)
 // What is the sum of the IDs of those games?
 void e1(vector<string> input)
 {
+    int sum = 0;
     for (string line : input)
     {
         // Game Nº
         line = line.erase(0, 5);
         int n_game = line[0] - '0';
-        line = line.erase(0, 3);
+        //digits...
+        line = line.erase(0, 1);
+        while (isdigit(line[0]))
+        {
+            n_game = (n_game * 10) + (line[0] - '0');
+            line = line.erase(0, 1);
+        }
+        //
+        line = line.erase(0, 2);
 
         // RGB
-        cout << n_game << "->" << line << endl;
+        cout << n_game << "->\t" << line << "\t";
         bool game = rgb(line);
         if (game)
+        {
             cout << "Possible" << endl;
+            sum += n_game;
+            /* cout << "RESULT -> " << sum << endl; */
+        }
         else
             cout << "Impossible" << endl;
     }
+    cout << "RESULT -> " << sum << endl;
 }
 
 void e2(vector<string> input)
@@ -79,8 +112,8 @@ void e2(vector<string> input)
 
 int main() {
     // INPUT
-    ifstream input_file("../../input/02mini");
-    /* ifstream input_file("../../input/02"); */
+    /* ifstream input_file("../../input/02mini"); */
+    ifstream input_file("../../input/02");
     if (!input_file.is_open()) {
         cerr << "Failed to open input file!" << endl;
         return 1;
