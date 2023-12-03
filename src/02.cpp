@@ -70,6 +70,61 @@ bool rgb(string line)
     return true;
 }
 
+int rgb_power(string line)
+{
+    int buffer = 0;
+    int r = 0;
+    int g = 0;
+    int b = 0;
+    bool checking = false;
+    bool second_digit = false;
+
+    for (char chara : line)
+    {
+        if (checking)
+        {
+            if (chara == 'r')
+            {
+                /* r += buffer; */
+                if (buffer > r)
+                    r = buffer;
+                checking = false;
+            }
+            if (chara == 'g')
+            {
+                /* g += buffer; */
+                if (buffer > g)
+                    g = buffer;
+                checking = false;
+            }
+            if (chara == 'b')
+            {
+                /* b += buffer; */
+                if (buffer > b)
+                    b = buffer;
+                checking = false;
+            }
+        }
+        else    // if (!checking)
+            if (second_digit)
+            {
+                if (isdigit(chara))
+                    buffer = (buffer * 10) + (chara - '0');
+                checking = true;
+                second_digit = false;
+            }
+            else
+                if (isdigit(chara))
+                {
+                    buffer = chara - '0';
+                    second_digit = true;
+                }
+    }
+    cout << "R:" << r << "|G:" << g << "|B:" << b << endl;
+
+    return r * g * b;
+}
+
 // Determine which games would have been possible if the bag had been loaded with only 
 // 12 red cubes     13 green cubes      14 blue cubes
 // What is the sum of the IDs of those games?
@@ -106,8 +161,30 @@ void e1(vector<string> input)
     cout << "RESULT -> " << sum << endl;
 }
 
+// power = r*g*b
 void e2(vector<string> input)
 {
+    int power = 0;
+    for (string line : input)
+    {
+        // Game Nº
+        line = line.erase(0, 5);
+        int n_game = line[0] - '0';
+        //digits...
+        line = line.erase(0, 1);
+        while (isdigit(line[0]))
+        {
+            n_game = (n_game * 10) + (line[0] - '0');
+            line = line.erase(0, 1);
+        }
+        //
+        line = line.erase(0, 2);
+
+        // RGB
+        cout << n_game << "->\t" << line << "\t";
+        power += rgb_power(line);
+    }
+    cout << "POWER -> " << power << endl;
 }
 
 int main() {
@@ -126,8 +203,8 @@ int main() {
     /* input.push_back("");    // append empty line */
 
     // SOLVE
-    e1(input);
-    /* e2(input); */
+    /* e1(input); */
+    e2(input);
 
     return 0;
 }
